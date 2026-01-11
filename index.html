@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danny Lukmana | Frontend & UI/UX Developer</title>
+    <meta name="description" content="Portfolio of Danny Lukmana, a Frontend Developer specialized in React, Next.js, and Interactive UI/UX.">
+    <meta property="og:title" content="Danny Lukmana - Frontend Developer Portfolio">
+    <meta property="og:description" content="Check out my latest projects, virtual tours, and interactive web experiences.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/1920/1920990.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1920/1920990.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- 1. CONFIGURATION --- */
+        :root {
+            --bg-color: #f8f9fa; --pattern-color: rgba(0, 0, 0, 0.05); 
+            --text-main: #2d3436; --text-muted: #636e72;
+            --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            --orb-color: #e2e8f0; --card-hover-bg: rgba(255, 255, 255, 0.9);
+            --btn-bg: #2d3436; --btn-text: #ffffff; 
+            --menu-bg: rgba(255, 255, 255, 0.95); --outline-color: #2d3436; 
+            --line-color: rgba(0, 0, 0, 0.1); --accent-color: #2d3436;
+            --scroll-track: rgba(0, 0, 0, 0.05); --scroll-thumb: rgba(0, 0, 0, 0.2); --scroll-thumb-hover: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #050505; --pattern-color: transparent; 
+            --text-main: #ffffff; --text-muted: #a0a0a0;
+            --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --orb-color: #2a2a2a; --card-hover-bg: rgba(255, 255, 255, 0.07);
+            --btn-bg: #ffffff; --btn-text: #000000; 
+            --menu-bg: rgba(10, 10, 10, 0.95); --outline-color: #ffffff; 
+            --line-color: rgba(255, 255, 255, 0.1); --accent-color: #ffffff;
+            --scroll-track: rgba(255, 255, 255, 0.05); --scroll-thumb: rgba(255, 255, 255, 0.2); --scroll-thumb-hover: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- 2. GLOBAL RESET --- */
+        html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb); border-radius: 20px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--scroll-thumb-hover); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; line-height: 1.6; transition: background-color 0.4s ease, color 0.4s ease; background-image: radial-gradient(var(--pattern-color) 1px, transparent 1px); background-size: 24px 24px; }
+        section { scroll-margin-top: 100px; position: relative; z-index: 1; }
+
+        /* --- 3. BACKGROUND ORBS --- */
+        .ambient-light { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; background: var(--orb-color); transition: background 0.4s ease; animation: float 10s infinite ease-in-out alternate; }
+        .orb-1 { width: 300px; height: 300px; top: 10%; left: 20%; }
+        .orb-2 { width: 400px; height: 400px; bottom: 10%; right: 10%; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* --- 4. NAVIGATION --- */
+        nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 0.8rem 2rem; border-radius: 50px; background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-shadow: var(--glass-shadow); }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; z-index: 1002; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; transition: color 0.3s; font-weight: 500; }
+        .nav-links a:hover { color: var(--text-main); }
+        .nav-actions { display: flex; align-items: center; gap: 15px; z-index: 1002; }
+        .theme-toggle { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .theme-toggle:hover { background: var(--glass-border); }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .bar { width: 25px; height: 2px; background-color: var(--text-main); transition: 0.3s; }
+
+        /* --- 5. HERO & AVATAR --- */
+        .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 100px 20px 20px; }
+        .avatar-container { position: relative; width: 180px; height: 180px; margin-bottom: 2rem; }
+        .avatar-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; background: radial-gradient(circle, var(--orb-color) 0%, transparent 70%); border-radius: 50%; z-index: 1; }
+        .avatar-img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; animation: floatAvatar 6s ease-in-out infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); }
+        .greeting-badge { position: absolute; bottom: 10px; right: -40px; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; z-index: 3; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1s forwards; opacity: 0; transform: scale(0.5); background: rgba(255,255,255,0.9); box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap; color: #2d3436; }
+        @keyframes floatAvatar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+        .flip-container { display: block; perspective: 1000px; height: auto; margin-bottom: 1rem; }
+        .flip-text { display: block; font-size: 6rem; font-weight: 900; text-transform: uppercase; line-height: 1.1; letter-spacing: -2px; color: transparent; -webkit-text-stroke: 2px var(--outline-color); transform-origin: center bottom; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease; opacity: 1; transform: rotateX(0deg); }
+        .flip-text.out { transform: rotateX(-90deg); opacity: 0; }
+        .subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin-bottom: 2.5rem; margin-top: 1rem; min-height: 1.5em;}
+        .type-cursor { display: inline-block; width: 2px; height: 1.2em; background-color: var(--text-main); margin-left: 2px; animation: blink 1s infinite; vertical-align: bottom; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .cta-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 12px 30px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: 0.3s; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--btn-bg); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .btn-glass { background: rgba(125,125,125,0.05); color: var(--text-main); border: 1px solid var(--glass-border); }
+        .btn-glass:hover { background: rgba(125,125,125,0.1); transform: translateY(-2px); }
+
+        /* --- ADDED: TECH STACK MARQUEE --- */
+        .tech-marquee-section { padding: 2rem 0; width: 100%; overflow: hidden; margin-top: -2rem; margin-bottom: 2rem; opacity: 0.8; }
+        .marquee-wrapper { display: flex; width: fit-content; animation: scrollMarquee 25s linear infinite; }
+        .marquee-item { font-size: 1.5rem; font-weight: 800; color: var(--outline-color); margin: 0 2rem; white-space: nowrap; display: flex; align-items: center; gap: 10px; opacity: 0.5; transition: 0.3s; cursor: default; }
+        .marquee-item:hover { opacity: 1; color: var(--text-main); transform: scale(1.1); }
+        @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* --- 6. COMMON UTILS --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 5rem 20px; }
+        .section-title { font-size: 2rem; margin-bottom: 3rem; border-left: 4px solid var(--text-main); padding-left: 1rem; opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .section-title.active { opacity: 1; transform: translateY(0); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; perspective: 1000px; }
+        .card { padding: 2.5rem; border-radius: 20px; border: 1px solid var(--glass-border); min-height: 300px; opacity: 0; transform: translateY(50px); transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s, border-color 0.3s; transform-style: preserve-3d; will-change: transform; display: flex; flex-direction: column; justify-content: space-between; background: var(--glass-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card:hover { border-color: var(--text-muted); } .card.active { opacity: 1; transform: translateY(0); }
+        .tag { font-size: 0.75rem; padding: 4px 12px; border-radius: 12px; background: rgba(0,0,0,0.05); border: 1px solid var(--glass-border); color: var(--text-main); display: inline-block; margin: 5px 5px 0 0; }
+        [data-theme="dark"] .tag { background: rgba(255,255,255,0.1); }
+
+        /* --- 7. TIMELINE --- */
+        .timeline { position: relative; max-width: 1000px; margin: 0 auto; }
+        .timeline::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: var(--line-color); transform: translateX(-50%); }
+        .timeline-item { position: relative; margin-bottom: 3rem; width: 50%; opacity: 0; transition: all 0.8s ease; }
+        .timeline-item:nth-child(odd) { left: 0; padding-right: 3rem; text-align: right; transform: translateX(-50px); }
+        .timeline-item:nth-child(even) { left: 50%; padding-left: 3rem; text-align: left; transform: translateX(50px); }
+        .timeline-item.active { opacity: 1; transform: translateX(0); }
+        .timeline-dot { position: absolute; top: 1.5rem; width: 16px; height: 16px; background: var(--accent-color); border-radius: 50%; border: 3px solid var(--bg-color); box-shadow: 0 0 10px var(--orb-color); z-index: 2; }
+        .timeline-item:nth-child(odd) .timeline-dot { right: -8px; } .timeline-item:nth-child(even) .timeline-dot { left: -8px; }
+        .timeline-item:first-child .timeline-dot { background: #0070f3; box-shadow: 0 0 20px #0070f3; animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        .timeline-content { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 16px; display: inline-block; width: 100%; transition: transform 0.3s ease; box-shadow: var(--glass-shadow); }
+        .timeline-content:hover { transform: scale(1.02); border-color: var(--text-main); }
+
+        /* --- 8. BUTTONS & CERT --- */
+        .btn-view-cert { margin-top: 1rem; background: transparent; border: 1px solid var(--text-main); color: var(--text-main); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; width: fit-content; }
+        .btn-view-cert:hover { background: var(--text-main); color: var(--bg-color); }
+        .cert-id { font-size: 0.8rem; font-family: monospace; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; color: var(--text-muted); }
+        .cert-header { margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; }
+
+        /* --- 9. CONTACT --- */
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 15px; background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); color: var(--text-main); text-decoration: none; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; }
+        [data-theme="dark"] .contact-btn { background: rgba(255,255,255,0.03); }
+        .contact-btn:hover { background: var(--glass-border); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .contact-btn.primary { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
+        .contact-btn.primary:hover { opacity: 0.9; }
+        .social-icon { width: 20px; height: 20px; fill: currentColor; } 
+
+        /* --- 10. MODALS --- */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; overflow-y: auto; }
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        .modal-content { background: #fff; border: 1px solid var(--glass-border); border-radius: 20px; padding: 2rem; width: 90%; max-width: 900px; height: auto; max-height: 90vh; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow-y: auto; }
+        [data-theme="dark"] .modal-content { background: #111; }
+        .close-btn { position: absolute; top: 15px; right: 25px; font-size: 2rem; color: var(--text-main); cursor: pointer; z-index: 1001; }
+        .close-btn:hover { color: #ff4757; }
+        iframe { width: 100%; height: 80vh; border: none; border-radius: 10px; background: #fff; }
+        .tour-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .tour-card { background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; position: relative; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        [data-theme="dark"] .tour-card { background: rgba(255,255,255,0.05); }
+        .tour-card:hover { transform: translateY(-5px) scale(1.02); border-color: #00f2fe; box-shadow: 0 10px 20px rgba(0, 242, 254, 0.15); }
+        .tour-img { width: 100%; height: 150px; object-fit: cover; }
+        .tour-info { padding: 1rem; }
+        .tour-info h4 { margin-bottom: 0.3rem; font-size: 1.1rem; color: var(--text-main); }
+        .tour-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+        .modal-title { font-size: 1.8rem; margin-bottom: 1rem; text-align: center; color: var(--text-main); }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+        /* --- 11. FOOTER --- */
+        footer { text-align: -webkit-center; padding: 4rem 20px; border-top: 1px solid var(--glass-border); color: var(--text-muted); margin-top: 4rem; }
+
+        /* --- 12. RESPONSIVE --- */
+        @media (max-width: 768px) {
+            nav { justify-content: space-between; padding: 1rem 1.5rem; }
+            .nav-links { position: absolute; top: 100%; left: 0; width: 100%; flex-direction: column; align-items: center; background: var(--menu-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2rem; margin-top: 15px; transform: scaleY(0); transform-origin: top; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+            .nav-links.active { transform: scaleY(1); opacity: 1; visibility: visible; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+            .hamburger { display: flex; }
+            .hamburger.toggle .bar:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+            .hamburger.toggle .bar:nth-child(2) { opacity: 0; }
+            .hamburger.toggle .bar:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+            .flip-text { font-size: 3rem; -webkit-text-stroke: 1px var(--outline-color); }
+            .grid { grid-template-columns: 1fr; }
+            .timeline::before { left: 20px; }
+            .timeline-item { width: 100%; padding-left: 3rem; padding-right: 0; left: 0; text-align: left; margin-bottom: 2rem; }
+            .timeline-item:nth-child(odd), .timeline-item:nth-child(even) { transform: translateY(30px); left: 0; text-align: left; padding-left: 3rem; }
+            .timeline-item:nth-child(odd) .timeline-dot, .timeline-item:nth-child(even) .timeline-dot { left: 12px; right: auto; }
+            .timeline-item.active { transform: translateY(0); }
+            .modal-content { padding: 1.5rem; width: 95%; }
+            .tour-grid { grid-template-columns: 1fr; }
+            .cursor-dot, .cursor-outline { display: none; }
+            
+            /* --- MOBILE WIDGET FIXES --- */
+            /* Logic Mobile disesuaikan agar tetap hide di kiri */
+            .widget-toggle-btn { bottom: 20px; left: 15px; width: 45px; height: 45px; }
+
+            .floating-widget {
+                bottom: 20px; left: 70px; /* Sebelah kanan tombol toggle */
+                width: auto; max-width: 75%;
+                padding: 10px 15px;
+                justify-content: space-between;
+                background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+                transform: translateX(-150%); /* Tetap hide ke kiri */
+            }
+            .floating-widget.show {
+                transform: translateX(0); /* Muncul di sebelah tombol */
+            }
+
+            .music-player { gap: 8px; }
+            .music-text { margin-right: 0; max-width: 100px; }
+            .song-title { display: block; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .artist-name { display: none; }
+            .clock { font-size: 0.9rem; }
+            .weather { font-size: 0.6rem; }
+            
+            .greeting-badge { right: -10px; bottom: 0; font-size: 0.75rem; }
+            .avatar-container { width: 150px; height: 150px; }
+            
+            footer { padding-bottom: 120px; }
+
+            /* STACK BUTTONS VERTICALLY ON MOBILE RIGHT */
+            .chat-launcher { bottom: 100px; right: 20px; width: 50px; height: 50px; } /* Above Widget */
+            .back-to-top { bottom: 165px; right: 20px; width: 40px; height: 40px; } /* Above Chat */
+            
+            /* MOBILE CHAT WINDOW */
+            .chat-window { width: 90%; right: 5%; bottom: 170px; height: 350px; } /* Centered & Above buttons */
+        }
+
+        /* --- 14. FLOATING WIDGET (MODIFIED FOR TOGGLE) --- */
+        /* Toggle Button */
+        .widget-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            z-index: 1001; /* Layer diatas widget saat hide/show */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .widget-toggle-btn:hover { transform: scale(1.1); }
+        .widget-toggle-btn span { font-size: 24px; }
+
+        /* Widget Container */
+        .floating-widget { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 85px; /* Digeser ke kanan tombol toggle */
+            z-index: 1000; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            background: var(--glass-bg); 
+            border: 1px solid var(--glass-border); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            max-width: 90%;
+            
+            /* MODIFIED: Default Hidden State */
+            transform: translateX(-150%); /* Sembunyi ke kiri layar */
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Smooth bouncy effect */
+        }
+        
+        /* Class untuk Memunculkan Widget */
+        .floating-widget.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .music-player { display: flex; align-items: center; gap: 10px; }
+        .music-icon { font-size: 20px; color: var(--text-main); animation: spin 4s linear infinite; animation-play-state: paused; }
+        .music-text { display: flex; flex-direction: column; line-height: 1.2; margin-right: 5px; }
+        .song-title { font-size: 0.8rem; font-weight: 700; color: var(--text-main); }
+        .artist-name { font-size: 0.65rem; color: var(--text-muted); }
+        .play-btn { width: 35px; height: 35px; border-radius: 50%; border: none; background: var(--text-main); color: var(--bg-color); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .play-btn:hover { transform: scale(1.1); }
+        .divider { width: 1px; height: 30px; background: var(--line-color); }
+        .status-info { display: flex; flex-direction: column; justify-content: center; }
+        .clock { font-size: 0.9rem; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 2px; }
+        .weather { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- 15. CUSTOM CURSOR & SCROLL --- */
+        .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--text-main); }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--text-main); transition: width 0.2s, height 0.2s, background-color 0.2s; }
+        @media (min-width: 769px) { body { cursor: none; } a, button, .tour-card, .card, .chat-launcher, .chat-window input { cursor: none; } a:hover ~ .cursor-outline, button:hover ~ .cursor-outline, .chat-launcher:hover ~ .cursor-outline { transform: translate(-50%, -50%) scale(1.5); background: rgba(125,125,125,0.1); } }
+        .scroll-progress { position: fixed; top: 0; left: 0; width: 0%; height: 3px; background: linear-gradient(90deg, var(--text-main), #00f2fe); z-index: 9999; transition: width 0.1s; }
+        
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 998; }
+        .back-to-top.visible { opacity: 1; pointer-events: all; }
+        .back-to-top:hover { transform: translateY(-3px); background: var(--text-main); color: var(--bg-color); }
+
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--text-main); color: var(--bg-color); text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 9999; left: 50%; bottom: 100px; transform: translateX(-50%); box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-weight: 600; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
+
+        /* --- 16. CHATBOT STYLES (DESKTOP DEFAULT) --- */
+        .chat-launcher { position: fixed; bottom: 90px; right: 30px; width: 55px; height: 55px; background: var(--text-main); color: var(--bg-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1001; transition: transform 0.3s ease; }
+        .chat-launcher:hover { transform: scale(1.1); }
+        .chat-window { position: fixed; bottom: 160px; right: 30px; width: 320px; height: 400px; background: var(--menu-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(15px); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 1001; display: flex; flex-direction: column; overflow: hidden; transform: scale(0); transform-origin: bottom right; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .chat-window.open { transform: scale(1); }
+        .chat-header { background: var(--text-main); color: var(--bg-color); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-header h4 { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; max-width: 80%; line-height: 1.4; }
+        .message.bot { background: rgba(125,125,125,0.1); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message.user { background: var(--text-main); color: var(--bg-color); align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-footer { padding: 10px; border-top: 1px solid var(--glass-border); display: flex; gap: 5px; }
+        .chat-input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.5); outline: none; font-family: inherit; font-size: 0.85rem; color: var(--text-main); }
+        .chat-send { background: var(--text-main); color: var(--bg-color); border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+
+        /* --- NEW ABOUT LAYOUT --- */
+.about-content-wrapper { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: center; }
+.about-text p { margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1rem; }
+.about-highlight { color: var(--text-main); font-weight: 700; position: relative; z-index: 1; }
+.about-highlight::after { content: ''; position: absolute; bottom: 2px; left: 0; width: 100%; height: 8px; background: rgba(0, 242, 254, 0.2); z-index: -1; transform: rotate(-2deg); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.stat-card { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 16px; text-align: center; transition: transform 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+.stat-card:hover { transform: translateY(-5px); border-color: var(--text-main); }
+.stat-number { display: block; font-size: 2.5rem; font-weight: 900; color: var(--text-main); line-height: 1; margin-bottom: 0.5rem; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+.focus-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; }
+.focus-pill { padding: 8px 16px; background: rgba(0,0,0,0.03); border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--text-main); border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 8px; }
+
+/* Responsive untuk About */
+@media (max-width: 768px) {
+    .about-content-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* --- NEW SERVICES SECTION --- */
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 2rem; }
+.service-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2.5rem 2rem; transition: all 0.4s ease; position: relative; overflow: hidden; z-index: 1; display: flex; flex-direction: column; height: 100%; }
+.service-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%); z-index: -1; opacity: 0; transition: opacity 0.4s; }
+.service-card:hover { transform: translateY(-10px); border-color: var(--text-main); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+.service-card:hover::before { opacity: 1; }
+
+.service-icon-box { width: 60px; height: 60px; background: var(--text-main); color: var(--bg-color); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; font-size: 2rem; transition: transform 0.4s; }
+.service-card:hover .service-icon-box { transform: rotate(-10deg) scale(1.1); }
+
+.service-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); }
+.service-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; flex-grow: 1; }
+.service-list { list-style: none; padding: 0; margin: 0; }
+.service-list li { display: flex; align-items: center; gap: 10px; color: var(--text-main); font-size: 0.85rem; margin-bottom: 8px; font-weight: 500; opacity: 0.8; }
+.service-list li span { color: #00b894; font-size: 1rem; }
+
+/* --- FAQ SECTION --- */
+.faq-grid { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+.faq-item { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; }
+.faq-question { padding: 1.5rem; width: 100%; text-align: left; background: transparent; border: none; outline: none; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-main); font-weight: 600; font-size: 1rem; font-family: 'Outfit', sans-serif; }
+.faq-question:hover { background: rgba(0,0,0,0.02); }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0, 1, 0, 1); padding: 0 1.5rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+.faq-item.active .faq-answer { max-height: 200px; padding-bottom: 1.5rem; transition: max-height 0.3s ease-in-out; }
+.faq-icon { transition: transform 0.3s; font-size: 1.2rem; }
+.faq-item.active .faq-icon { transform: rotate(180deg); }
+
+/* --- FINAL CTA BANNER --- */
+.final-cta { text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, var(--text-main) 0%, #434343 100%); border-radius: 30px; margin-top: 5rem; position: relative; overflow: hidden; color: var(--bg-color); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+.cta-content { position: relative; z-index: 2; }
+.cta-title { font-size: 2.5rem; margin-bottom: 1rem; color: #fff; } /* Force white text */
+.cta-desc { margin-bottom: 2rem; opacity: 0.8; max-width: 600px; margin-left: auto; margin-right: auto; color: #eee; }
+.cta-bg-icon { position: absolute; top: -20px; right: -20px; font-size: 15rem; opacity: 0.05; transform: rotate(-15deg); color: #fff; pointer-events: none; }
+
+/* --- MODERN MINIMALIST FOOTER --- */
+footer {
+    margin-top: 6rem;
+    padding: 5rem 20px 2rem;
+    border-top: 1px solid var(--glass-border);
+    background: linear-gradient(to top, rgba(0,0,0,0.02) 0%, transparent 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr; /* Kolom 1 lebih lebar */
+    gap: 3rem;
+    margin-bottom: 4rem;
+}
+
+/* Kolom Brand */
+.footer-brand h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+    letter-spacing: -1px;
+}
+.footer-desc {
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 350px;
+    margin-bottom: 1.5rem;
+}
+
+/* Status Badge (Titik Hijau Berkedip) */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(39, 174, 96, 0.1);
+    border: 1px solid rgba(39, 174, 96, 0.2);
+    border-radius: 50px;
+    color: #27ae60;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.status-dot {
+    width: 8px; height: 8px;
+    background-color: #27ae60;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+    animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+}
+
+/* Kolom Link */
+.footer-heading {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+}
+.footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.footer-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+.footer-links a:hover {
+    color: #00f2fe;
+    transform: translateX(5px);
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-content { grid-template-columns: 1fr; gap: 2.5rem; }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; padding-bottom: 6rem; }
+}
+
+    </style>
+</head>
+<body data-theme="light"> 
+    
+    <div class="scroll-progress" id="scrollProgress"></div>
+    <div id="toast">Email copied to clipboard!</div>
+
+    <div class="ambient-light">
+        <div class="orb orb-1" id="orb1"></div>
+        <div class="orb orb-2" id="orb2"></div>
+    </div>
+
+    <nav>
+        <div class="logo">DANNY LUKMANA.</div>
+        <div class="nav-links" id="nav-links">
+            <a href="#projects" class="nav-link-item">Work</a>
+            <a href="#experience" class="nav-link-item">Journey</a>
+            <a href="#certifications" class="nav-link-item">Certifications</a>
+            <a href="#about" class="nav-link-item">About</a>
+            <a href="#services" class="nav-link-item">Services</a>
+            <a href="#contact" class="nav-link-item">Contact</a>
+            <a href="#faq" class="nav-link-item">FAQ</a>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="theme-toggle" aria-label="Switch Theme">
+                <span class="material-icons-round" id="toggle-icon">dark_mode</span>
+            </button>
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 20px; margin-bottom: 20px; font-size: 0.75rem; letter-spacing: 2px; font-weight: 600;">
+            MY PORTFOLIO
+        </div>
+        <div class="avatar-container">
+            <div class="avatar-bg"></div>
+            <img src="https://cdn-icons-png.flaticon.com/512/1920/1920990.png" alt="My Avatar" class="avatar-img">
+            <div class="greeting-badge glass">
+                <span id="greeting-icon">👋</span>
+                <span id="greeting-text">Hi, I'm Danny!</span>
+            </div>
+        </div>
+        <div class="flip-container"><span class="flip-text">DESIGN DRIVEN</span></div>
+        <p class="subtitle reveal-element"><span id="typewriter"></span><span class="type-cursor"></span></p>
+        <div class="cta-group reveal-element">
+            <a href="#projects" class="btn btn-primary">View Projects</a>
+            <a href="https://drive.google.com/drive/folders/1erFo3FMDfxmjo3X-fxbA6-JyP8elH9GM?usp=sharing" class="btn btn-glass" onclick="showToast('Downloading CV... (Demo)')">
+                Download CV <span class="material-icons-round" style="font-size: 1.1rem;">download</span>
+            </a>
+            <button class="btn btn-glass" onclick="triggerConfetti()">Let's Talk</button>
+        </div>
+    </section>
+
+    <section class="tech-marquee-section">
+        <div class="marquee-wrapper">
+            <div class="marquee-item"><span class="material-icons-round">code</span> HTML5</div>
+            <div class="marquee-item"><span class="material-icons-round">style</span> CSS3</div>
+            <div class="marquee-item"><span class="material-icons-round">javascript</span> JavaScript</div>
+            <div class="marquee-item"><span class="material-icons-round">data_object</span> TypeScript</div>
+            <div class="marquee-item"><span class="material-icons-round">widgets</span> React JS</div>
+            <div class="marquee-item"><span class="material-icons-round">layers</span> Next.js</div>
+            <div class="marquee-item"><span class="material-icons-round">view_in_ar</span> Pano2VR</div>
+            <div class="marquee-item"><span class="material-icons-round">terminal</span> Node.js</div>
+            <div class="marquee-item"><span class="material-icons-round">brush</span> UI/UX Design</div>
+            <div class="marquee-item"><span class="material-icons-round">code</span> HTML5</div>
+            <div class="marquee-item"><span class="material-icons-round">style</span> CSS3</div>
+            <div class="marquee-item"><span class="material-icons-round">javascript</span> JavaScript</div>
+            <div class="marquee-item"><span class="material-icons-round">data_object</span> TypeScript</div>
+            <div class="marquee-item"><span class="material-icons-round">widgets</span> React JS</div>
+            <div class="marquee-item"><span class="material-icons-round">layers</span> Next.js</div>
+            <div class="marquee-item"><span class="material-icons-round">view_in_ar</span> Pano2VR</div>
+            <div class="marquee-item"><span class="material-icons-round">terminal</span> Node.js</div>
+            <div class="marquee-item"><span class="material-icons-round">brush</span> UI/UX Design</div>
+        </div>
+    </section>
+
+    <section id="projects" class="container">
+        <h2 class="section-title">Selected Works</h2>
+        <div class="grid">
+            <div class="card glass tilt-card">
+                <h3>Virtual Tour 360°</h3>
+                <p>Interactive visual navigation website built for regional government.</p>
+                <div><span class="tag">Pano2VR</span><span class="tag">JavaScript</span></div>
+                <button class="btn-view-cert" onclick="openTourModal()" style="width: 100%; text-align: center; margin-top: auto;">
+                    Explore Virtual Tour <span class="material-icons-round" style="font-size: 1rem; vertical-align: middle; margin-left: 5px;">360</span>
+                </button>
+            </div>
+            <div class="card glass tilt-card">
+                <h3>Teavaro Funnel Manager</h3>
+                <p>Complex and responsive marketing data management dashboard.</p>
+                <div><span class="tag">Vaadin</span><span class="tag">Java</span></div>
+            </div>
+            <div class="card glass tilt-card">
+                <h3>Alodokter Medical Platform</h3>
+                <p>Integrated and user-friendly healthcare information platform.</p>
+                <div><span class="tag">Ruby on Rails</span><span class="tag">Fullstack</span></div>
+                <button class="btn-view-cert" onclick="window.open('https://dannylukmana.github.io/alodokterweb/', '_blank')" style="width: 100%; text-align: center; margin-top: auto;">
+                    View Website <span class="material-icons-round" style="font-size: 1rem; vertical-align: middle; margin-left: 5px;">language</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="container">
+        <h2 class="section-title" style="text-align: center; border: none; padding: 0;">Experience & Education</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Feb 2025 - Present • Jakarta, Indonesia</div>
+                    <h3 style="font-size: 1.25rem;">Teknologi Govirtual Indonesia</h3>
+                    <div style="font-style: italic; opacity: 0.9;">Frontend Developer</div>
+                    <p style="margin-top: 0.8rem; color: var(--text-muted); font-size: 0.95rem;">Developed a Virtual Tour website for a regional government institution in Indonesia. The website features interactive 360-degree visual navigation.</p>
+                </div>
+            </div>
+             <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Apr 2022 - Sep 2024 • London, UK</div>
+                    <h3 style="font-size: 1.25rem;">Teavaro</h3>
+                    <div style="font-style: italic; opacity: 0.9;">Frontend Web Developer</div>
+                    <p style="margin-top: 0.8rem; color: var(--text-muted); font-size: 0.95rem;">Worked on Teavaro’s Funnel Manager website using the Vaadin 14 framework. Responsibilities included designing visually appealing UIs and cross-browser compatibility.</p>
+                </div>
+            </div>
+             <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Apr 2022 - Sep 2024 • Surabaya, East Java, Indonesia</div>
+                    <h3 style="font-size: 1.25rem;">Keraton Karya Solusi</h3>
+                    <div style="font-style: italic; opacity: 0.9;">Frontend Web Developer</div>
+                    <p style="margin-top: 0.8rem; color: var(--text-muted); font-size: 0.95rem;">Dedicated Frontend Web Developer for Teavaro. Privileged to craft and enhance the Funnel Manager website using Vaadin 14, Java, OOP principles.</p>
+                </div>
+            </div>
+             <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Nov 2021 - Dec 2021 • Jakarta, Indonesia</div>
+                    <h3 style="font-size: 1.25rem;">Rakamin Academy</h3>
+                    <div style="font-style: italic; opacity: 0.9;">Fullstack Developer</div>
+                    <p style="margin-top: 0.8rem; color: var(--text-muted); font-size: 0.95rem;">Completed an internship bootcamp at Alodokter. Contributed to building a user-friendly and responsive platform for delivering medical information.</p>
+                </div>
+            </div>
+             <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">2017 - 2021 • Bandung, West Java, Indonesia</div>
+                    <h3 style="font-size: 1.25rem;">Telkom University</h3>
+                    <div style="font-style: italic; opacity: 0.9;">Bachelor Degree</div>
+                    <p style="margin-top: 0.8rem; color: var(--text-muted); font-size: 0.95rem;">Presented a method for detecting arm tremors based on quaternion analysis using fuzzy logic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="certifications" class="container">
+        <h2 class="section-title">Licenses, Certifications & Research</h2>
+        <div class="grid">
+            <div class="card glass tilt-card">
+                <div class="cert-header">
+                    <h3 style="font-size: 1.3rem;">Certified Secure Computer User</h3>
+                    <p style="color: var(--text-muted); font-weight: 600;">EC-Council</p>
+                </div>
+                <div style="margin-bottom: 1rem;"><p style="font-size: 0.9rem;">Issued: Oct 2020</p></div>
+                <button class="btn-view-cert" onclick="openCert('https://drive.google.com/file/d/1uktI_Q752MqKgDD7lxBHq3JKX0Hz2KLy/preview')">View Credential <span class="material-icons-round" style="font-size: 0.9rem; vertical-align: middle;">visibility</span></button>
+            </div>
+            <div class="card glass tilt-card">
+                <div class="cert-header">
+                    <h3 style="font-size: 1.3rem;">Alodokter - Fullstack Developer</h3>
+                    <p style="color: var(--text-muted); font-weight: 600;">Rakamin Academy</p>
+                </div>
+                <div style="margin-bottom: 1rem;"><p style="font-size: 0.9rem;">Nov 2021 - Dec 2021</p></div>
+                <button class="btn-view-cert" onclick="openCert('https://drive.google.com/file/d/10zUeH83DFiAWfDiEqUAmtCq5JzYhmthD/preview')">View Credential <span class="material-icons-round" style="font-size: 0.9rem; vertical-align: middle;">visibility</span></button>
+            </div>
+            <div class="card glass tilt-card">
+                <div class="cert-header">
+                    <h3 style="font-size: 1.3rem;">Arm Tremor Detection Research</h3>
+                    <p style="color: var(--text-muted); font-weight: 600;">Telkom University</p>
+                </div>
+                <div style="margin-bottom: 1rem;"><p style="font-size: 0.9rem;">Published: 2021</p></div>
+                <button class="btn-view-cert" onclick="openCert('https://openlibrary.telkomuniversity.ac.id/home/catalog/id/174778/slug/deteksi-tremor-lengan-dengan-metode-quaternion-pada-data-imu.html')">View Publication <span class="material-icons-round" style="font-size: 0.9rem; vertical-align: middle;">menu_book</span></button>
+            </div>
+        </div>
+    </section>
+
+<section id="about" class="container">
+    <h2 class="section-title">About Me</h2>
+    
+    <div class="about-content-wrapper reveal-element">
+        <div class="about-text">
+            <h3 style="font-size: 2rem; line-height: 1.2; margin-bottom: 1.5rem;">
+                Transforming complex problems into <span class="about-highlight">elegant interfaces</span>.
+            </h3>
+            <p>
+                Hello! I'm Danny, a Frontend Developer based in Jakarta. My journey started with a curiosity about how things move on a screen, which led me to master the art of <strong>Pano2VR</strong>, <strong>3D Vista</strong>, <strong>JAVA</strong> and modern web technologies.
+            </p>
+            <p>
+                I specialize in bridging the gap between design and engineering. I don't just write code; I care deeply about <strong>pixel perfection</strong>, <strong>accessibility</strong>, and creating intuitive user flows that feel natural.
+            </p>
+            <p>
+                When I'm not debugging, you can find me exploring new coffee shops, writing tech blogs, or curating my Lofi playlists.
+            </p>
+            
+            <div style="margin-top: 2rem;">
+                <h4 style="font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Current Focus:</h4>
+                <div class="focus-tags">
+                    <div class="focus-pill"><span class="material-icons-round" style="font-size: 16px;">speed</span> Performance</div>
+                    <div class="focus-pill"><span class="material-icons-round" style="font-size: 16px;">devices</span> Responsive UI</div>
+                    <div class="focus-pill"><span class="material-icons-round" style="font-size: 16px;">360</span> Virtual Tours</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card tilt-card">
+                <span class="stat-number">3+</span>
+                <span class="stat-label">Years Exp.</span>
+            </div>
+            <div class="stat-card tilt-card">
+                <span class="stat-number">10+</span>
+                <span class="stat-label">Projects</span>
+            </div>
+            <div class="stat-card tilt-card">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Committed</span>
+            </div>
+            <div class="stat-card tilt-card" style="background: var(--text-main); color: var(--bg-color);">
+                <span class="stat-number" style="color: var(--bg-color);">☕</span>
+                <span class="stat-label" style="color: rgba(131, 165, 183, 0.7);">Coffee Driven</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="services" class="container">
+    <h2 class="section-title">What I Can Do</h2>
+    <div class="services-grid">
+        
+        <div class="service-card reveal-element">
+            <div class="service-icon-box">
+                <span class="material-icons-round">code</span>
+            </div>
+            <h3 class="service-title">Modern Web Development</h3>
+            <p class="service-desc">Building fast, responsive, and accessible websites using the latest React ecosystem. I focus on clean code and performance.</p>
+            <ul class="service-list">
+                <li><span class="material-icons-round">check_circle</span>React & Next.js Implementation</li>
+                <li><span class="material-icons-round">check_circle</span>Single Page Applications (SPA)</li>
+                <li><span class="material-icons-round">check_circle</span>API Integration (REST/GraphQL)</li>
+            </ul>
+        </div>
+
+        <div class="service-card reveal-element" style="border-color: rgba(0, 242, 254, 0.3);">
+            <div class="service-icon-box" style="background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);">
+                <span class="material-icons-round">360</span>
+            </div>
+            <h3 class="service-title">Interactive 360° Tours</h3>
+            <p class="service-desc">Creating immersive virtual experiences for tourism, real estate, or government institutions using Pano2VR.</p>
+            <ul class="service-list">
+                <li><span class="material-icons-round">check_circle</span>Custom Pano2VR Skinning</li>
+                <li><span class="material-icons-round">check_circle</span>Hotspot & Map Integration</li>
+                <li><span class="material-icons-round">check_circle</span>VR Headset Compatibility</li>
+            </ul>
+        </div>
+
+        <div class="service-card reveal-element">
+            <div class="service-icon-box">
+                <span class="material-icons-round">brush</span>
+            </div>
+            <h3 class="service-title">UI/UX Implementation</h3>
+            <p class="service-desc">Translating Figma designs into pixel-perfect code with smooth animations and interactions.</p>
+            <ul class="service-list">
+                <li><span class="material-icons-round">check_circle</span>Pixel-Perfect Slicing</li>
+                <li><span class="material-icons-round">check_circle</span>Interactive Animations (GSAP/Framer)</li>
+                <li><span class="material-icons-round">check_circle</span>Responsive Design Layouts</li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+
+<section id="faq" class="container">
+    <h2 class="section-title">Common Questions</h2>
+    <div class="faq-grid">
+        
+        <div class="faq-item reveal-element">
+            <button class="faq-question">
+                Are you available for freelance work?
+                <span class="material-icons-round faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer">
+                <p>Yes, I am currently open for freelance projects, mainly focusing on Frontend Development and Interactive Virtual Tours. Feel free to contact me for a discussion.</p>
+            </div>
+        </div>
+
+        <div class="faq-item reveal-element">
+            <button class="faq-question">
+                Can you handle backend tasks?
+                <span class="material-icons-round faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer">
+                <p>While my main expertise is Frontend (React/Next.js), I have experience with backend technologies like Node.js and Java (Vaadin) to build full-stack solutions if needed.</p>
+            </div>
+        </div>
+
+        <div class="faq-item reveal-element">
+            <button class="faq-question">
+                What is your typical timeline for a project?
+                <span class="material-icons-round faq-icon">expand_more</span>
+            </button>
+            <div class="faq-answer">
+                <p>It depends on the complexity. A standard landing page takes 3-5 days, while complex dashboards or virtual tours might take 2-4 weeks. We can discuss the timeline based on your requirements.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div class="container" style="padding-top: 0; padding-bottom: 0;">
+    <div class="final-cta reveal-element">
+        <span class="material-icons-round cta-bg-icon">rocket_launch</span>
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to build something amazing?</h2>
+            <p class="cta-desc">Whether it's a website revamp, a new dashboard, or a 360 virtual tour, let's turn your ideas into reality.</p>
+            <a href="mailto:dannylukmana.business@gmail.com" class="btn" style="background: #fff; color: #000; display: inline-flex; border: none;">
+                Start a Project <span class="material-icons-round" style="margin-left: 8px;">arrow_forward</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <section id="contact" class="container">
+        <h2 class="section-title">Get in Touch</h2>
+        <div class="card glass" style="text-align: center; padding: 4rem;">
+             <h3 style="font-size: 2rem; margin-bottom: 1rem;">Let's Work Together</h3>
+             <p style="margin-bottom: 3rem; color: var(--text-muted); max-width: 600px; margin-left: auto; margin-right: auto;">Interested in collaborating or have a project in mind? Feel free to reach out via email or connect through my social channels.</p>
+             <div class="contact-grid">
+                <button class="contact-btn primary" onclick="copyEmail()">
+                    <span class="material-icons-round">content_copy</span><span>Copy Email</span>
+                </button>
+                <a href="https://id.linkedin.com/in/muhamad-danny-lukmana-a74a6b295" target="_blank" class="contact-btn">
+                    <svg class="social-icon" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>LinkedIn</span>
+                </a>
+                <a href="https://github.com/dannylukmana" target="_blank" class="contact-btn">
+                    <svg class="social-icon" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>DannyLukmana</span>
+                </a>
+                <a href="https://github.com/arsipnusa" target="_blank" class="contact-btn">
+                    <svg class="social-icon" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>ArsipNusa</span>
+                </a>
+             </div>
+        </div>
+    </section>
+
+    <footer>
+    <div class="footer-content">
+        
+        <div class="footer-brand">
+            <h2>DANNY LUKMANA.</h2>
+            <p class="footer-desc">
+                A Frontend Developer focused on building smooth, interactive, and accessible web experiences using modern technologies.
+            </p>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                Available for new projects
+            </div>
+        </div>
+
+        <div>
+            <h4 class="footer-heading">Sitemap</h4>
+            <ul class="footer-links">
+                <li><a href="#projects">Selected Works</a></li>
+                <li><a href="#experience">Journey</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About Me</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="footer-heading">Connect</h4>
+            <ul class="footer-links">
+                <li><a href="https://linkedin.com" target="_blank">LinkedIn <span class="material-icons-round" style="font-size: 16px;">north_east</span></a></li>
+                <li><a href="https://github.com" target="_blank">GitHub <span class="material-icons-round" style="font-size: 16px;">north_east</span></a></li>
+                <li><a href="mailto:dannylukmana.business@gmail.com">Email Me <span class="material-icons-round" style="font-size: 16px;">mail</span></a></li>
+                <li><a href="#">Resume <span class="material-icons-round" style="font-size: 16px;">download</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div>&copy; 2026 Danny Lukmana. All Rights Reserved.</div>
+        <div style="display: flex; gap: 20px;">
+            <span>Jakarta, Indonesia</span>
+        </div>
+    </div>
+</footer>
+
+    <div class="back-to-top" id="backToTop" onclick="scrollToTop()"><span class="material-icons-round">arrow_upward</span></div>
+
+    <div class="chat-launcher" onclick="toggleChat()"><span class="material-icons-round">chat_bubble</span></div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header"><h4><span class="material-icons-round" style="font-size: 1.2rem;">smart_toy</span> Danny's AI</h4><span class="material-icons-round" style="cursor: pointer;" onclick="toggleChat()">close</span></div>
+        <div class="chat-body" id="chatBody"><div class="message bot">Halo! Saya asisten virtual Danny. Tanya saya seputar keahlian, pengalaman, atau kontak!</div></div>
+        <div class="chat-footer"><input type="text" id="chatInput" class="chat-input" placeholder="Tanya sesuatu..." onkeypress="handleEnter(event)"><button class="chat-send" onclick="sendMessage()"><span class="material-icons-round" style="font-size: 1rem;">send</span></button></div>
+    </div>
+
+    <div id="certModal" class="modal"><div class="modal-content glass"><span class="close-btn" onclick="closeCert()">&times;</span><iframe id="certIframe" src="" allow="autoplay"></iframe></div></div>
+    <div id="tourModal" class="modal"><div class="modal-content glass"><span class="close-btn" onclick="closeTourModal()">&times;</span><h2 class="modal-title">Select Destination</h2><div class="tour-grid"><div class="tour-card" onclick="window.open('https://semarang.govirtual.id/', '_blank')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Lawang_Sewu_in_Semarang_City.jpg/2560px-Lawang_Sewu_in_Semarang_City.jpg?auto=format&fit=crop&w=600&q=80" alt="Semarang" class="tour-img"><div class="tour-info"><h4>Semarang City</h4><p>Discover the historic charm and modern vibes of Central Java's capital.</p></div></div><div class="tour-card" onclick="window.open('https://jakarta.govirtual.id/urban-tourism/', '_blank')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Jakarta_CBD.jpg/2560px-Jakarta_CBD.jpg?auto=format&fit=crop&w=600&q=80" alt="Jakarta" class="tour-img"><div class="tour-info"><h4>Jakarta City</h4><p>Explore the bustling metropolis with immersive 360 views of urban landmarks.</p></div></div><div class="tour-card" onclick="window.open('https://virtualtour.lampungselatankab.go.id/tourism/', '_blank')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Bakauheni_Port.jpg/1280px-Bakauheni_Port.jpg?auto=format&fit=crop&w=600&q=80" alt="Lampung" class="tour-img"><div class="tour-info"><h4>Lampung Selatan</h4><p>Experience the natural beauty and tourism spots of the gateway to Sumatra.</p></div></div><div class="tour-card" onclick="window.open('https://virtual-tour.tangerangkab.go.id/', '_blank')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Bunderan_kota_tangerang_-_panoramio.jpg/1280px-Bunderan_kota_tangerang_-_panoramio.jpg?auto=format&fit=crop&w=600&q=80" alt="Tangerang" class="tour-img"><div class="tour-info"><h4>Tangerang Regency</h4><p>Navigate through the modern developments and public facilities of Banten.</p></div></div><div class="tour-card" onclick="window.open('https://lahat.govirtual.id/', '_blank')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Sunrise_Bukit_Besak.jpg/1280px-Sunrise_Bukit_Besak.jpg?auto=format&fit=crop&w=600&q=80" alt="Lahat" class="tour-img"><div class="tour-info"><h4>Lahat Regency</h4><p>Traverse Lahat’s modern urban areas and accessible public facilities.</p></div></div><div class="tour-card" onclick="window.open('https://bogor.govirtual.id/', '_blank')"><img src="https://www.rumah123.com/seo-cms/assets/large_gunung_salak_ef9b6b9cb3/large_gunung_salak_ef9b6b9cb3.jpg?auto=format&fit=crop&w=600&q=80" alt="Lahat" class="tour-img"><div class="tour-info"><h4>Bogor Regency</h4><p>Discover Bogor’s contemporary city areas supported by convenient and easily accessible public amenities.</p></div></div></div></div></div>
+
+    <button class="widget-toggle-btn" id="widgetToggleBtn" aria-label="Toggle Music Widget">
+        <span class="material-icons-round">music_note</span>
+    </button>
+
+    <div class="floating-widget glass" id="floatingWidget">
+        <div class="music-player"><div class="music-info"><span class="music-icon material-icons-round">music_note</span><div class="music-text"><span class="song-title">Lofi Focus Beat</span><span class="artist-name">Chill Vibes</span></div></div><button id="playBtn" class="play-btn"><span class="material-icons-round" id="playIcon">play_arrow</span></button><audio id="audioPlayer" loop><source src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"></audio></div>
+        <div class="divider"></div>
+        <div class="status-info"><div id="clock" class="clock">00:00</div><div class="weather"><span class="material-icons-round" style="font-size: 14px;">wb_sunny</span><span>Jakarta, 29°C</span></div></div>
+    </div>
+
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle'); const body = document.body; const hamburger = document.getElementById('hamburger'); const navLinks = document.getElementById('nav-links'); const navItems = document.querySelectorAll('.nav-link-item'); const toggleIcon = document.getElementById('toggle-icon');
+        function updateIcon(theme) { toggleIcon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode'; }
+        const savedTheme = localStorage.getItem('theme'); if (savedTheme) { body.setAttribute('data-theme', savedTheme); updateIcon(savedTheme); } else { body.setAttribute('data-theme', 'light'); updateIcon('light'); }
+        toggleBtn.addEventListener('click', () => { const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; body.setAttribute('data-theme', newTheme); localStorage.setItem('theme', newTheme); updateIcon(newTheme); });
+        hamburger.addEventListener('click', () => { navLinks.classList.toggle('active'); hamburger.classList.toggle('toggle'); }); navItems.forEach(item => { item.addEventListener('click', () => { navLinks.classList.remove('active'); hamburger.classList.remove('toggle'); }); });
+
+        const flipText = document.querySelector('.flip-text'); const words = ["DESIGN DRIVEN", "FRONTEND DEV", "UI/UX ENTHUSIAST"]; let wordIndex = 0; setInterval(() => { flipText.classList.add('out'); setTimeout(() => { wordIndex = (wordIndex + 1) % words.length; flipText.textContent = words[wordIndex]; flipText.classList.remove('out'); }, 600); }, 3000);
+        
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }; const globalObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); }); }, observerOptions);
+        document.querySelectorAll('.card, .timeline-item, .section-title, .subtitle, .cta-group').forEach(el => globalObserver.observe(el));
+
+        document.querySelectorAll('.tilt-card').forEach(card => { card.addEventListener('mousemove', (e) => { const rect = card.getBoundingClientRect(); const rotateX = ((e.clientY - rect.top - rect.height/2) / (rect.height/2)) * -10; const rotateY = ((e.clientX - rect.left - rect.width/2) / (rect.width/2)) * 10; card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`; }); card.addEventListener('mouseleave', () => { card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`; }); });
+        
+        const orb1 = document.getElementById('orb1'), orb2 = document.getElementById('orb2'); document.addEventListener('mousemove', (e) => { orb1.style.transform = `translate(${e.clientX/window.innerWidth * 50}px, ${e.clientY/window.innerHeight * 50}px)`; orb2.style.transform = `translate(-${e.clientX/window.innerWidth * 50}px, -${e.clientY/window.innerHeight * 50}px)`; });
+
+        const certModal = document.getElementById('certModal'), certIframe = document.getElementById('certIframe'); function openCert(url) { certIframe.src = url; certModal.classList.add('active'); document.body.style.overflow = 'hidden'; } function closeCert() { certModal.classList.remove('active'); certIframe.src = ""; document.body.style.overflow = 'auto'; }
+        const tourModal = document.getElementById('tourModal'); function openTourModal() { tourModal.classList.add('active'); document.body.style.overflow = 'hidden'; } function closeTourModal() { tourModal.classList.remove('active'); document.body.style.overflow = 'auto'; }
+        window.onclick = function(event) { if (event.target == certModal) closeCert(); if (event.target == tourModal) closeTourModal(); }
+
+        function updateClock() { const now = new Date(); const hours = String(now.getHours()).padStart(2, '0'); const minutes = String(now.getMinutes()).padStart(2, '0'); document.getElementById('clock').textContent = `${hours}:${minutes}`; } setInterval(updateClock, 1000); updateClock();
+        const audio = document.getElementById('audioPlayer'); const playBtn = document.getElementById('playBtn'); const playIcon = document.getElementById('playIcon'); const musicIcon = document.querySelector('.music-icon'); playBtn.addEventListener('click', () => { if (audio.paused) { audio.play(); playIcon.textContent = 'pause'; musicIcon.style.animationPlayState = 'running'; } else { audio.pause(); playIcon.textContent = 'play_arrow'; musicIcon.style.animationPlayState = 'paused'; } });
+
+        const cursorDot = document.getElementById('cursor-dot'); const cursorOutline = document.getElementById('cursor-outline'); window.addEventListener('mousemove', (e) => { const posX = e.clientX; const posY = e.clientY; cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`; cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" }); });
+        document.querySelectorAll('a, button, .tour-card, .card').forEach(el => { el.addEventListener('mouseenter', () => { cursorOutline.style.width = '60px'; cursorOutline.style.height = '60px'; cursorOutline.style.backgroundColor = 'rgba(125, 125, 125, 0.05)'; }); el.addEventListener('mouseleave', () => { cursorOutline.style.width = '40px'; cursorOutline.style.height = '40px'; cursorOutline.style.backgroundColor = 'transparent'; }); });
+
+        function setGreeting() { const hour = new Date().getHours(); const greetingText = document.getElementById('greeting-text'); const greetingIcon = document.getElementById('greeting-icon'); if (hour >= 5 && hour < 12) { greetingText.textContent = "Good Morning!"; greetingIcon.textContent = "🌤️"; } else if (hour >= 12 && hour < 18) { greetingText.textContent = "Good Afternoon!"; greetingIcon.textContent = "☀️"; } else { greetingText.textContent = "Good Evening!"; greetingIcon.textContent = "🌙"; } } setGreeting();
+        const typeText = "Crafting digital experiences that are aesthetic, functional, and intuitive."; const typeElement = document.getElementById('typewriter'); let typeIndex = 0; function typeWriter() { if (typeIndex < typeText.length) { typeElement.textContent += typeText.charAt(typeIndex); typeIndex++; setTimeout(typeWriter, 40); } } setTimeout(typeWriter, 500);
+
+        const scrollProgress = document.getElementById('scrollProgress'); const backToTopBtn = document.getElementById('backToTop'); window.onscroll = function() { const winScroll = document.body.scrollTop || document.documentElement.scrollTop; const height = document.documentElement.scrollHeight - document.documentElement.clientHeight; const scrolled = (winScroll / height) * 100; scrollProgress.style.width = scrolled + "%"; if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) { backToTopBtn.classList.add('visible'); } else { backToTopBtn.classList.remove('visible'); } }; function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function copyEmail() { const email = "dannylukmana.business@gmail.com"; navigator.clipboard.writeText(email).then(() => { showToast("Email copied to clipboard!"); }); } function showToast(message) { const toast = document.getElementById("toast"); toast.textContent = message; toast.className = "show"; setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000); }
+        function triggerConfetti() { document.getElementById('contact').scrollIntoView({behavior: 'smooth'}); var count = 200; var defaults = { origin: { y: 0.7 } }; function fire(particleRatio, opts) { confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) })); } fire(0.25, { spread: 26, startVelocity: 55 }); fire(0.2, { spread: 60 }); fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 }); fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 }); fire(0.1, { spread: 120, startVelocity: 45 }); }
+
+        const chatWindow = document.getElementById('chatWindow'); const chatInput = document.getElementById('chatInput'); const chatBody = document.getElementById('chatBody'); function toggleChat() { chatWindow.classList.toggle('open'); } function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+        function sendMessage() {
+            const text = chatInput.value.trim(); if (!text) return;
+            addMessage(text, 'user'); chatInput.value = '';
+            setTimeout(() => { const response = getBotResponse(text.toLowerCase()); addMessage(response, 'bot'); }, 600);
+        }
+        function addMessage(text, sender) { const div = document.createElement('div'); div.classList.add('message', sender); div.textContent = text; chatBody.appendChild(div); chatBody.scrollTop = chatBody.scrollHeight; }
+        function getBotResponse(input) {
+            if (input.includes('hai') || input.includes('halo') || input.includes('hi') || input.includes('pagi') || input.includes('siang') || input.includes('malam')) return "Halo! Ada yang bisa saya bantu tentang portofolio ini?";
+            if (input.includes('siapa') || input.includes('nama') || input.includes('about')) return "Saya Danny, Frontend Developer yang fokus pada detail visual dan pengalaman pengguna (UI/UX).";
+            if (input.includes('skill') || input.includes('bisa apa') || input.includes('tech') || input.includes('stack')) return "Tech stack saya meliputi HTML, CSS, JavaScript, React, Next.js, Pano2VR, dan Java (Vaadin).";
+            if (input.includes('kerja') || input.includes('pengalaman') || input.includes('work')) return "Saat ini saya bekerja di Teknologi Govirtual Indonesia. Sebelumnya di Teavaro dan Keraton Karya Solusi.";
+            if (input.includes('kontak') || input.includes('hubungi') || input.includes('email') || input.includes('wa')) return "Boleh banget! Kirim email ke dannylukmana.business@gmail.com atau cek LinkedIn saya di bagian Contact.";
+            if (input.includes('lokasi') || input.includes('tinggal') || input.includes('domisili')) return "Saya saat ini berdomisili di Jakarta, Indonesia.";
+            if (input.includes('proyek') || input.includes('project') || input.includes('karya')) return "Beberapa proyek saya: Virtual Tour 360, Teavaro Funnel Manager, dan Alodokter Medical Platform.";
+            return "aduh males jawab, cari sendiri aja atau tanya di contact person bisa nanya langsung";
+        }
+
+        // FAQ Accordion Logic
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Tutup semua FAQ lain (opsional, biar rapi)
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        /* --- ADDED: TOGGLE WIDGET LOGIC --- */
+        const widgetToggleBtn = document.getElementById('widgetToggleBtn');
+        const floatingWidget = document.getElementById('floatingWidget');
+
+        widgetToggleBtn.addEventListener('click', () => {
+            floatingWidget.classList.toggle('show');
+            const icon = widgetToggleBtn.querySelector('span');
+            
+            if (floatingWidget.classList.contains('show')) {
+                icon.textContent = 'close'; // Ubah icon jadi X saat widget muncul
+            } else {
+                icon.textContent = 'music_note'; // Kembalikan ke icon music saat hide
+            }
+        });
+    </script>
+</body>
+</html>
