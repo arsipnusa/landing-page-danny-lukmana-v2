@@ -504,8 +504,8 @@ footer {
             <a href="#certifications" class="nav-link-item">Certifications</a>
             <a href="#about" class="nav-link-item">About</a>
             <a href="#services" class="nav-link-item">Services</a>
-            <a href="#contact" class="nav-link-item">Contact</a>
             <a href="#faq" class="nav-link-item">FAQ</a>
+            <a href="#contact" class="nav-link-item">Contact</a>  
         </div>
         <div class="nav-actions">
             <button class="theme-toggle" id="theme-toggle" aria-label="Switch Theme">
@@ -900,8 +900,8 @@ footer {
 
     <div class="chat-window" id="chatWindow">
         <div class="chat-header"><h4><span class="material-icons-round" style="font-size: 1.2rem;">smart_toy</span> Danny's AI</h4><span class="material-icons-round" style="cursor: pointer;" onclick="toggleChat()">close</span></div>
-        <div class="chat-body" id="chatBody"><div class="message bot">Halo! Saya asisten virtual Danny. Tanya saya seputar keahlian, pengalaman, atau kontak!</div></div>
-        <div class="chat-footer"><input type="text" id="chatInput" class="chat-input" placeholder="Tanya sesuatu..." onkeypress="handleEnter(event)"><button class="chat-send" onclick="sendMessage()"><span class="material-icons-round" style="font-size: 1rem;">send</span></button></div>
+        <div class="chat-body" id="chatBody"><div class="message bot">Hi! I'm Danny's virtual assistant. Ask me about my skills, experience, or contacts!</div></div>
+        <div class="chat-footer"><input type="text" id="chatInput" class="chat-input" placeholder="Ask me something..." onkeypress="handleEnter(event)"><button class="chat-send" onclick="sendMessage()"><span class="material-icons-round" style="font-size: 1rem;">send</span></button></div>
     </div>
 
     <div id="certModal" class="modal"><div class="modal-content glass"><span class="close-btn" onclick="closeCert()">&times;</span><iframe id="certIframe" src="" allow="autoplay"></iframe></div></div>
@@ -920,87 +920,322 @@ footer {
     <div class="cursor-dot" id="cursor-dot"></div>
     <div class="cursor-outline" id="cursor-outline"></div>
 
-    <script>
-        const toggleBtn = document.getElementById('theme-toggle'); const body = document.body; const hamburger = document.getElementById('hamburger'); const navLinks = document.getElementById('nav-links'); const navItems = document.querySelectorAll('.nav-link-item'); const toggleIcon = document.getElementById('toggle-icon');
+<script>
+        // --- CONFIGURATION & UTILS ---
+        const toggleBtn = document.getElementById('theme-toggle'); 
+        const body = document.body; 
+        const hamburger = document.getElementById('hamburger'); 
+        const navLinks = document.getElementById('nav-links'); 
+        const navItems = document.querySelectorAll('.nav-link-item'); 
+        const toggleIcon = document.getElementById('toggle-icon');
+
         function updateIcon(theme) { toggleIcon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode'; }
-        const savedTheme = localStorage.getItem('theme'); if (savedTheme) { body.setAttribute('data-theme', savedTheme); updateIcon(savedTheme); } else { body.setAttribute('data-theme', 'light'); updateIcon('light'); }
-        toggleBtn.addEventListener('click', () => { const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; body.setAttribute('data-theme', newTheme); localStorage.setItem('theme', newTheme); updateIcon(newTheme); });
-        hamburger.addEventListener('click', () => { navLinks.classList.toggle('active'); hamburger.classList.toggle('toggle'); }); navItems.forEach(item => { item.addEventListener('click', () => { navLinks.classList.remove('active'); hamburger.classList.remove('toggle'); }); });
-
-        const flipText = document.querySelector('.flip-text'); const words = ["DESIGN DRIVEN", "FRONTEND DEV", "UI/UX ENTHUSIAST"]; let wordIndex = 0; setInterval(() => { flipText.classList.add('out'); setTimeout(() => { wordIndex = (wordIndex + 1) % words.length; flipText.textContent = words[wordIndex]; flipText.classList.remove('out'); }, 600); }, 3000);
         
-        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }; const globalObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); }); }, observerOptions);
-        document.querySelectorAll('.card, .timeline-item, .section-title, .subtitle, .cta-group').forEach(el => globalObserver.observe(el));
-
-        document.querySelectorAll('.tilt-card').forEach(card => { card.addEventListener('mousemove', (e) => { const rect = card.getBoundingClientRect(); const rotateX = ((e.clientY - rect.top - rect.height/2) / (rect.height/2)) * -10; const rotateY = ((e.clientX - rect.left - rect.width/2) / (rect.width/2)) * 10; card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`; }); card.addEventListener('mouseleave', () => { card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`; }); });
+        const savedTheme = localStorage.getItem('theme'); 
+        if (savedTheme) { body.setAttribute('data-theme', savedTheme); updateIcon(savedTheme); } 
+        else { body.setAttribute('data-theme', 'light'); updateIcon('light'); }
         
-        const orb1 = document.getElementById('orb1'), orb2 = document.getElementById('orb2'); document.addEventListener('mousemove', (e) => { orb1.style.transform = `translate(${e.clientX/window.innerWidth * 50}px, ${e.clientY/window.innerHeight * 50}px)`; orb2.style.transform = `translate(-${e.clientX/window.innerWidth * 50}px, -${e.clientY/window.innerHeight * 50}px)`; });
+        toggleBtn.addEventListener('click', () => { 
+            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
+            body.setAttribute('data-theme', newTheme); 
+            localStorage.setItem('theme', newTheme); 
+            updateIcon(newTheme); 
+        });
+        
+        hamburger.addEventListener('click', () => { navLinks.classList.toggle('active'); hamburger.classList.toggle('toggle'); }); 
+        navItems.forEach(item => { item.addEventListener('click', () => { navLinks.classList.remove('active'); hamburger.classList.remove('toggle'); }); });
 
-        const certModal = document.getElementById('certModal'), certIframe = document.getElementById('certIframe'); function openCert(url) { certIframe.src = url; certModal.classList.add('active'); document.body.style.overflow = 'hidden'; } function closeCert() { certModal.classList.remove('active'); certIframe.src = ""; document.body.style.overflow = 'auto'; }
-        const tourModal = document.getElementById('tourModal'); function openTourModal() { tourModal.classList.add('active'); document.body.style.overflow = 'hidden'; } function closeTourModal() { tourModal.classList.remove('active'); document.body.style.overflow = 'auto'; }
+        // --- ANIMATIONS ---
+        const flipText = document.querySelector('.flip-text'); 
+        const words = ["DESIGN DRIVEN", "FRONTEND DEV", "UI/UX ENTHUSIAST"]; 
+        let wordIndex = 0; 
+        setInterval(() => { 
+            flipText.classList.add('out'); 
+            setTimeout(() => { 
+                wordIndex = (wordIndex + 1) % words.length; 
+                flipText.textContent = words[wordIndex]; 
+                flipText.classList.remove('out'); 
+            }, 600); 
+        }, 3000);
+        
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }; 
+        const globalObserver = new IntersectionObserver((entries) => { 
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); }); 
+        }, observerOptions);
+        
+        document.querySelectorAll('.card, .timeline-item, .section-title, .subtitle, .cta-group, .reveal-element').forEach(el => globalObserver.observe(el));
+
+        // --- TILT EFFECT ---
+        document.querySelectorAll('.tilt-card').forEach(card => { 
+            card.addEventListener('mousemove', (e) => { 
+                const rect = card.getBoundingClientRect(); 
+                const rotateX = ((e.clientY - rect.top - rect.height/2) / (rect.height/2)) * -10; 
+                const rotateY = ((e.clientX - rect.left - rect.width/2) / (rect.width/2)) * 10; 
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`; 
+            }); 
+            card.addEventListener('mouseleave', () => { card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`; }); 
+        });
+
+        // --- BACKGROUND ORBS ---
+        const orb1 = document.getElementById('orb1'), orb2 = document.getElementById('orb2'); 
+        document.addEventListener('mousemove', (e) => { 
+            orb1.style.transform = `translate(${e.clientX/window.innerWidth * 50}px, ${e.clientY/window.innerHeight * 50}px)`; 
+            orb2.style.transform = `translate(-${e.clientX/window.innerWidth * 50}px, -${e.clientY/window.innerHeight * 50}px)`; 
+        });
+
+        // --- MODALS ---
+        const certModal = document.getElementById('certModal'), certIframe = document.getElementById('certIframe'); 
+        function openCert(url) { certIframe.src = url; certModal.classList.add('active'); document.body.style.overflow = 'hidden'; } 
+        function closeCert() { certModal.classList.remove('active'); certIframe.src = ""; document.body.style.overflow = 'auto'; }
+        
+        const tourModal = document.getElementById('tourModal'); 
+        function openTourModal() { tourModal.classList.add('active'); document.body.style.overflow = 'hidden'; } 
+        function closeTourModal() { tourModal.classList.remove('active'); document.body.style.overflow = 'auto'; }
+        
         window.onclick = function(event) { if (event.target == certModal) closeCert(); if (event.target == tourModal) closeTourModal(); }
 
-        function updateClock() { const now = new Date(); const hours = String(now.getHours()).padStart(2, '0'); const minutes = String(now.getMinutes()).padStart(2, '0'); document.getElementById('clock').textContent = `${hours}:${minutes}`; } setInterval(updateClock, 1000); updateClock();
-        const audio = document.getElementById('audioPlayer'); const playBtn = document.getElementById('playBtn'); const playIcon = document.getElementById('playIcon'); const musicIcon = document.querySelector('.music-icon'); playBtn.addEventListener('click', () => { if (audio.paused) { audio.play(); playIcon.textContent = 'pause'; musicIcon.style.animationPlayState = 'running'; } else { audio.pause(); playIcon.textContent = 'play_arrow'; musicIcon.style.animationPlayState = 'paused'; } });
+        // --- WIDGETS (Time, Music, Greeting) ---
+        function updateClock() { 
+            const now = new Date(); 
+            const hours = String(now.getHours()).padStart(2, '0'); 
+            const minutes = String(now.getMinutes()).padStart(2, '0'); 
+            document.getElementById('clock').textContent = `${hours}:${minutes}`; 
+        } 
+        setInterval(updateClock, 1000); updateClock();
 
-        const cursorDot = document.getElementById('cursor-dot'); const cursorOutline = document.getElementById('cursor-outline'); window.addEventListener('mousemove', (e) => { const posX = e.clientX; const posY = e.clientY; cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`; cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" }); });
-        document.querySelectorAll('a, button, .tour-card, .card').forEach(el => { el.addEventListener('mouseenter', () => { cursorOutline.style.width = '60px'; cursorOutline.style.height = '60px'; cursorOutline.style.backgroundColor = 'rgba(125, 125, 125, 0.05)'; }); el.addEventListener('mouseleave', () => { cursorOutline.style.width = '40px'; cursorOutline.style.height = '40px'; cursorOutline.style.backgroundColor = 'transparent'; }); });
+        const audio = document.getElementById('audioPlayer'); 
+        const playBtn = document.getElementById('playBtn'); 
+        const playIcon = document.getElementById('playIcon'); 
+        const musicIcon = document.querySelector('.music-icon'); 
+        
+        playBtn.addEventListener('click', () => { 
+            if (audio.paused) { 
+                audio.play(); playIcon.textContent = 'pause'; musicIcon.style.animationPlayState = 'running'; 
+            } else { 
+                audio.pause(); playIcon.textContent = 'play_arrow'; musicIcon.style.animationPlayState = 'paused'; 
+            } 
+        });
 
-        function setGreeting() { const hour = new Date().getHours(); const greetingText = document.getElementById('greeting-text'); const greetingIcon = document.getElementById('greeting-icon'); if (hour >= 5 && hour < 12) { greetingText.textContent = "Good Morning!"; greetingIcon.textContent = "🌤️"; } else if (hour >= 12 && hour < 18) { greetingText.textContent = "Good Afternoon!"; greetingIcon.textContent = "☀️"; } else { greetingText.textContent = "Good Evening!"; greetingIcon.textContent = "🌙"; } } setGreeting();
-        const typeText = "Crafting digital experiences that are aesthetic, functional, and intuitive."; const typeElement = document.getElementById('typewriter'); let typeIndex = 0; function typeWriter() { if (typeIndex < typeText.length) { typeElement.textContent += typeText.charAt(typeIndex); typeIndex++; setTimeout(typeWriter, 40); } } setTimeout(typeWriter, 500);
+        function setGreeting() { 
+            const hour = new Date().getHours(); 
+            const greetingText = document.getElementById('greeting-text'); 
+            const greetingIcon = document.getElementById('greeting-icon'); 
+            if (hour >= 5 && hour < 12) { greetingText.textContent = "Good Morning!"; greetingIcon.textContent = "🌤️"; } 
+            else if (hour >= 12 && hour < 18) { greetingText.textContent = "Good Afternoon!"; greetingIcon.textContent = "☀️"; } 
+            else { greetingText.textContent = "Good Evening!"; greetingIcon.textContent = "🌙"; } 
+        } 
+        setGreeting();
 
-        const scrollProgress = document.getElementById('scrollProgress'); const backToTopBtn = document.getElementById('backToTop'); window.onscroll = function() { const winScroll = document.body.scrollTop || document.documentElement.scrollTop; const height = document.documentElement.scrollHeight - document.documentElement.clientHeight; const scrolled = (winScroll / height) * 100; scrollProgress.style.width = scrolled + "%"; if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) { backToTopBtn.classList.add('visible'); } else { backToTopBtn.classList.remove('visible'); } }; function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function copyEmail() { const email = "dannylukmana.business@gmail.com"; navigator.clipboard.writeText(email).then(() => { showToast("Email copied to clipboard!"); }); } function showToast(message) { const toast = document.getElementById("toast"); toast.textContent = message; toast.className = "show"; setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000); }
-        function triggerConfetti() { document.getElementById('contact').scrollIntoView({behavior: 'smooth'}); var count = 200; var defaults = { origin: { y: 0.7 } }; function fire(particleRatio, opts) { confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) })); } fire(0.25, { spread: 26, startVelocity: 55 }); fire(0.2, { spread: 60 }); fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 }); fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 }); fire(0.1, { spread: 120, startVelocity: 45 }); }
+        const typeText = "Crafting digital experiences that are aesthetic, functional, and intuitive."; 
+        const typeElement = document.getElementById('typewriter'); 
+        let typeIndex = 0; 
+        function typeWriter() { 
+            if (typeIndex < typeText.length) { typeElement.textContent += typeText.charAt(typeIndex); typeIndex++; setTimeout(typeWriter, 40); } 
+        } 
+        setTimeout(typeWriter, 500);
 
-        const chatWindow = document.getElementById('chatWindow'); const chatInput = document.getElementById('chatInput'); const chatBody = document.getElementById('chatBody'); function toggleChat() { chatWindow.classList.toggle('open'); } function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
-        function sendMessage() {
-            const text = chatInput.value.trim(); if (!text) return;
-            addMessage(text, 'user'); chatInput.value = '';
-            setTimeout(() => { const response = getBotResponse(text.toLowerCase()); addMessage(response, 'bot'); }, 600);
+        // --- CURSOR & SCROLL ---
+        const cursorDot = document.getElementById('cursor-dot'); 
+        const cursorOutline = document.getElementById('cursor-outline'); 
+        
+        window.addEventListener('mousemove', (e) => { 
+            const posX = e.clientX; const posY = e.clientY; 
+            cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`; 
+            cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" }); 
+        });
+        
+        document.querySelectorAll('a, button, .tour-card, .card').forEach(el => { 
+            el.addEventListener('mouseenter', () => { cursorOutline.style.width = '60px'; cursorOutline.style.height = '60px'; cursorOutline.style.backgroundColor = 'rgba(125, 125, 125, 0.05)'; }); 
+            el.addEventListener('mouseleave', () => { cursorOutline.style.width = '40px'; cursorOutline.style.height = '40px'; cursorOutline.style.backgroundColor = 'transparent'; }); 
+        });
+
+        const scrollProgress = document.getElementById('scrollProgress'); 
+        const backToTopBtn = document.getElementById('backToTop'); 
+        
+        window.onscroll = function() { 
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop; 
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight; 
+            const scrolled = (winScroll / height) * 100; 
+            scrollProgress.style.width = scrolled + "%"; 
+            if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) { backToTopBtn.classList.add('visible'); } 
+            else { backToTopBtn.classList.remove('visible'); } 
+        }; 
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function copyEmail() { 
+            const email = "dannylukmana.business@gmail.com"; 
+            navigator.clipboard.writeText(email).then(() => { showToast("Email copied to clipboard!"); }); 
+        } 
+        
+        function showToast(message) { 
+            const toast = document.getElementById("toast"); 
+            toast.textContent = message; toast.className = "show"; 
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000); 
         }
-        function addMessage(text, sender) { const div = document.createElement('div'); div.classList.add('message', sender); div.textContent = text; chatBody.appendChild(div); chatBody.scrollTop = chatBody.scrollHeight; }
-        function getBotResponse(input) {
-            if (input.includes('hai') || input.includes('halo') || input.includes('hi') || input.includes('pagi') || input.includes('siang') || input.includes('malam')) return "Halo! Ada yang bisa saya bantu tentang portofolio ini?";
-            if (input.includes('siapa') || input.includes('nama') || input.includes('about')) return "Saya Danny, Frontend Developer yang fokus pada detail visual dan pengalaman pengguna (UI/UX).";
-            if (input.includes('skill') || input.includes('bisa apa') || input.includes('tech') || input.includes('stack')) return "Tech stack saya meliputi HTML, CSS, JavaScript, React, Next.js, Pano2VR, dan Java (Vaadin).";
-            if (input.includes('kerja') || input.includes('pengalaman') || input.includes('work')) return "Saat ini saya bekerja di Teknologi Govirtual Indonesia. Sebelumnya di Teavaro dan Keraton Karya Solusi.";
-            if (input.includes('kontak') || input.includes('hubungi') || input.includes('email') || input.includes('wa')) return "Boleh banget! Kirim email ke dannylukmana.business@gmail.com atau cek LinkedIn saya di bagian Contact.";
-            if (input.includes('lokasi') || input.includes('tinggal') || input.includes('domisili')) return "Saya saat ini berdomisili di Jakarta, Indonesia.";
-            if (input.includes('proyek') || input.includes('project') || input.includes('karya')) return "Beberapa proyek saya: Virtual Tour 360, Teavaro Funnel Manager, dan Alodokter Medical Platform.";
-            return "Maaf... Aku kurang bisa jelasin detail, mending langsung hubungi contact person aja biar dapat jawaban paling tepat";
+
+        function triggerConfetti() { 
+            document.getElementById('contact').scrollIntoView({behavior: 'smooth'}); 
+            var count = 200; var defaults = { origin: { y: 0.7 } }; 
+            function fire(particleRatio, opts) { confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) })); } 
+            fire(0.25, { spread: 26, startVelocity: 55 }); fire(0.2, { spread: 60 }); fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 }); fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 }); fire(0.1, { spread: 120, startVelocity: 45 }); 
         }
 
-        // FAQ Accordion Logic
+        // --- FAQ LOGIC ---
         const faqQuestions = document.querySelectorAll('.faq-question');
         faqQuestions.forEach(question => {
             question.addEventListener('click', () => {
                 const item = question.parentElement;
                 const isActive = item.classList.contains('active');
-                
-                // Tutup semua FAQ lain (opsional, biar rapi)
                 document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
-
-                if (!isActive) {
-                    item.classList.add('active');
-                }
+                if (!isActive) { item.classList.add('active'); }
             });
         });
 
-        /* --- ADDED: TOGGLE WIDGET LOGIC --- */
+        // --- WIDGET TOGGLE ---
         const widgetToggleBtn = document.getElementById('widgetToggleBtn');
         const floatingWidget = document.getElementById('floatingWidget');
-
         widgetToggleBtn.addEventListener('click', () => {
             floatingWidget.classList.toggle('show');
             const icon = widgetToggleBtn.querySelector('span');
-            
-            if (floatingWidget.classList.contains('show')) {
-                icon.textContent = 'close'; // Ubah icon jadi X saat widget muncul
-            } else {
-                icon.textContent = 'music_note'; // Kembalikan ke icon music saat hide
-            }
+            icon.textContent = floatingWidget.classList.contains('show') ? 'close' : 'music_note';
         });
+
+        // ==========================================
+        //         SMART MULTILINGUAL CHATBOT
+        // ==========================================
+        const chatWindow = document.getElementById('chatWindow');
+        const chatInput = document.getElementById('chatInput');
+        const chatBody = document.getElementById('chatBody');
+
+        function toggleChat() { chatWindow.classList.toggle('open'); }
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        // Knowledge Base Data
+        const botKnowledge = {
+            greeting: {
+                id_keywords: ['halo', 'hai', 'pagi', 'siang', 'sore', 'malam', 'woi', 'tes'],
+                en_keywords: ['hello', 'hi', 'hey', 'morning', 'afternoon', 'evening', 'test'],
+                response_id: "Halo! Saya asisten virtual Danny. Ada yang bisa saya bantu seputar portofolio ini?",
+                response_en: "Hello! I'm Danny's virtual assistant. How can I help you with this portfolio?"
+            },
+            identity: {
+                id_keywords: ['siapa', 'kamu', 'nama', 'bot', 'robot'],
+                en_keywords: ['who', 'you', 'name', 'bot', 'robot'],
+                response_id: "Saya Danny, Frontend Developer yang fokus pada detail visual dan pengalaman pengguna (UI/UX).",
+                response_en: "I am Danny, a Frontend Developer focused on visual details and user experience (UI/UX)."
+            },
+            skills: {
+                id_keywords: ['bisa', 'skill', 'keahlian', 'jago', 'stack', 'teknologi'],
+                en_keywords: ['skill', 'can', 'ability', 'stack', 'tech', 'technology'],
+                response_id: "Tech stack utama saya: HTML, CSS, JavaScript, React, Next.js, Pano2VR, dan Java (Vaadin).",
+                response_en: "My main tech stack includes: HTML, CSS, JavaScript, React, Next.js, Pano2VR, and Java (Vaadin)."
+            },
+            experience: {
+                id_keywords: ['kerja', 'pengalaman', 'pernah', 'kantor', 'pt'],
+                en_keywords: ['work', 'experience', 'job', 'office', 'company'],
+                response_id: "Saat ini saya bekerja di Teknologi Govirtual Indonesia. Sebelumnya di Teavaro dan Keraton Karya Solusi.",
+                response_en: "Currently, I work at Teknologi Govirtual Indonesia. Previously at Teavaro and Keraton Karya Solusi."
+            },
+            contact: {
+                id_keywords: ['kontak', 'hubungi', 'email', 'wa', 'nomor', 'telepon'],
+                en_keywords: ['contact', 'reach', 'email', 'number', 'phone', 'call'],
+                response_id: "Silakan hubungi email saya di dannylukmana.business@gmail.com atau cek LinkedIn di bagian bawah halaman.",
+                response_en: "Please reach me via email at dannylukmana.business@gmail.com or check the LinkedIn link at the bottom."
+            },
+            location: {
+                id_keywords: ['lokasi', 'alamat', 'tinggal', 'domisili', 'mana'],
+                en_keywords: ['location', 'address', 'live', 'stay', 'where'],
+                response_id: "Saya saat ini berdomisili di Jakarta, Indonesia.",
+                response_en: "I am currently based in Jakarta, Indonesia."
+            },
+            projects: {
+                id_keywords: ['proyek', 'project', 'karya', 'bikin', 'buat'],
+                en_keywords: ['project', 'work', 'portfolio', 'make', 'create'],
+                response_id: "Beberapa proyek saya: Virtual Tour 360, Teavaro Funnel Manager, dan Alodokter Medical Platform.",
+                response_en: "Some of my projects: Virtual Tour 360, Teavaro Funnel Manager, and Alodokter Medical Platform."
+            }
+        };
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            chatInput.value = '';
+
+            // Simulate thinking delay for responsiveness feel
+            setTimeout(() => {
+                const response = getSmartResponse(text);
+                addMessage(response, 'bot');
+            }, 600);
+        }
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.classList.add('message', sender);
+            div.textContent = text;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight; // Auto scroll to bottom
+        }
+
+        function getSmartResponse(input) {
+            const lowerInput = input.toLowerCase();
+
+            // 1. Collect all ID and EN keywords to detect language
+            let idScore = 0;
+            let enScore = 0;
+            let detectedIntent = null;
+
+            // Iterate through knowledge base to find matches
+            for (const [key, data] of Object.entries(botKnowledge)) {
+                // Check ID keywords
+                data.id_keywords.forEach(word => {
+                    if (lowerInput.includes(word)) {
+                        idScore++;
+                        detectedIntent = key; // Save intent if found
+                    }
+                });
+                // Check EN keywords
+                data.en_keywords.forEach(word => {
+                    if (lowerInput.includes(word)) {
+                        enScore++;
+                        detectedIntent = key;
+                    }
+                });
+            }
+
+            // 2. Language Decision Logic
+            let detectedLang = 'unknown';
+            
+            if (idScore === 0 && enScore === 0) {
+                // Check for generic English common words if no specific keywords match
+                if (/\b(the|is|are|you|my|can)\b/.test(lowerInput)) {
+                    detectedLang = 'en';
+                } else if (/\b(yang|di|ke|dari|ini|itu)\b/.test(lowerInput)) {
+                    detectedLang = 'id';
+                } else {
+                    detectedLang = 'unknown';
+                }
+            } else if (idScore >= enScore) {
+                detectedLang = 'id';
+            } else {
+                detectedLang = 'en';
+            }
+
+            // 3. Return Response
+            if (detectedLang === 'unknown') {
+                return "I'm sorry, I don't understand your language. Please use English or Bahasa Indonesia.";
+            }
+
+            if (detectedLang === 'id') {
+                if (detectedIntent) return botKnowledge[detectedIntent].response_id;
+                return "Maaf, saya kurang mengerti konteksnya. Bisa tanya tentang 'skill', 'proyek', atau 'kontak'?";
+            } else {
+                // detectedLang === 'en'
+                if (detectedIntent) return botKnowledge[detectedIntent].response_en;
+                return "I didn't quite catch that. You can ask about my 'skills', 'projects', or 'contact' info.";
+            }
+        }
     </script>
 </body>
 </html>
