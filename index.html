@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danny Lukmana | Frontend & UI/UX Developer</title>
+    <title>Danny | Frontend Dev.</title>
     <meta name="description" content="Portfolio of Danny Lukmana, a Frontend Developer specialized in React, Next.js, and Interactive UI/UX.">
     <meta property="og:title" content="Danny Lukmana - Frontend Developer Portfolio">
     <meta property="og:description" content="Check out my latest projects, virtual tours, and interactive web experiences.">
@@ -101,12 +101,15 @@
         .marquee-item:hover { opacity: 1; color: var(--text-main); transform: scale(1.1); }
         @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* --- 6. COMMON UTILS --- */
+        /* --- 6. COMMON UTILS & UPDATED GRID --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 5rem 20px; }
         .section-title { font-size: 2rem; margin-bottom: 3rem; border-left: 4px solid var(--text-main); padding-left: 1rem; opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
         .section-title.active { opacity: 1; transform: translateY(0); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; perspective: 1000px; }
-        .card { padding: 2.5rem; border-radius: 20px; border: 1px solid var(--glass-border); min-height: 300px; opacity: 0; transform: translateY(50px); transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s, border-color 0.3s; transform-style: preserve-3d; will-change: transform; display: flex; flex-direction: column; justify-content: space-between; background: var(--glass-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        
+        /* FIX: Adjusted minmax for better responsiveness on small screens */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; perspective: 1000px; }
+        
+        .card { padding: 2.5rem; border-radius: 20px; border: 1px solid var(--glass-border); min-height: 320px; opacity: 0; transform: translateY(50px); transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s, border-color 0.3s; transform-style: preserve-3d; will-change: transform; display: flex; flex-direction: column; justify-content: space-between; background: var(--glass-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .card:hover { border-color: var(--text-muted); } .card.active { opacity: 1; transform: translateY(0); }
         .tag { font-size: 0.75rem; padding: 4px 12px; border-radius: 12px; background: rgba(0,0,0,0.05); border: 1px solid var(--glass-border); color: var(--text-main); display: inline-block; margin: 5px 5px 0 0; }
         [data-theme="dark"] .tag { background: rgba(255,255,255,0.1); }
@@ -172,7 +175,10 @@
             .hamburger.toggle .bar:nth-child(2) { opacity: 0; }
             .hamburger.toggle .bar:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
             .flip-text { font-size: 3rem; -webkit-text-stroke: 1px var(--outline-color); }
+            
+            /* FIX: Ensure grid is single column on mobile and prevent overflow */
             .grid { grid-template-columns: 1fr; }
+            
             .timeline::before { left: 20px; }
             .timeline-item { width: 100%; padding-left: 3rem; padding-right: 0; left: 0; text-align: left; margin-bottom: 2rem; }
             .timeline-item:nth-child(odd), .timeline-item:nth-child(even) { transform: translateY(30px); left: 0; text-align: left; padding-left: 3rem; }
@@ -560,19 +566,31 @@ footer {
     <section id="projects" class="container">
         <h2 class="section-title">Selected Works</h2>
         <div class="grid">
+            
+            <div class="card glass tilt-card">
+                <h3>Toko Arsip Nusa</h3>
+                <p>Affordable and efficient landing page creation service from my brand, Toko Arsip Nusa, with no hosting cost to accelerate MSMEs’ digital growth.</p>
+                <div><span class="tag">HTML/CSS</span><span class="tag">Static Site</span><span class="tag">Serverless</span></div>
+                <button class="btn-view-cert" onclick="window.open('https://arsipnusa.github.io/Landing-Page-Arsip-Nusa/', '_blank')" style="width: 100%; text-align: center; margin-top: auto;">
+                    Visit Store <span class="material-icons-round" style="font-size: 1rem; vertical-align: middle; margin-left: 5px;">storefront</span>
+                </button>
+            </div>
+
             <div class="card glass tilt-card">
                 <h3>Virtual Tour 360°</h3>
-                <p>Interactive visual navigation website built for regional government.</p>
+                <p>Interactive visual navigation website for regional government, supporting transparency and public services</p>
                 <div><span class="tag">Pano2VR</span><span class="tag">JavaScript</span></div>
                 <button class="btn-view-cert" onclick="openTourModal()" style="width: 100%; text-align: center; margin-top: auto;">
                     Explore Virtual Tour <span class="material-icons-round" style="font-size: 1rem; vertical-align: middle; margin-left: 5px;">360</span>
                 </button>
             </div>
+
             <div class="card glass tilt-card">
                 <h3>Teavaro Funnel Manager</h3>
                 <p>Complex and responsive marketing data management dashboard.</p>
                 <div><span class="tag">Vaadin</span><span class="tag">Java</span></div>
             </div>
+
             <div class="card glass tilt-card">
                 <h3>Alodokter Medical Platform</h3>
                 <p>Integrated and user-friendly healthcare information platform.</p>
@@ -581,6 +599,7 @@ footer {
                     View Website <span class="material-icons-round" style="font-size: 1rem; vertical-align: middle; margin-left: 5px;">language</span>
                 </button>
             </div>
+            
         </div>
     </section>
 
@@ -656,7 +675,7 @@ footer {
             </div>
             <div class="card glass tilt-card">
                 <div class="cert-header">
-                    <h3 style="font-size: 1.3rem;">Arm Tremor Detection Research</h3>
+                    <h3 style="font-size: 1.3rem;">Detection of Arm Tremor Using Quaternion-Based Analysis of IMU Data.</h3>
                     <p style="color: var(--text-muted); font-weight: 600;">Telkom University</p>
                 </div>
                 <div style="margin-bottom: 1rem;"><p style="font-size: 0.9rem;">Published: 2021</p></div>
@@ -859,8 +878,8 @@ footer {
         <div>
             <h4 class="footer-heading">Connect</h4>
             <ul class="footer-links">
-                <li><a href="https://linkedin.com" target="_blank">LinkedIn <span class="material-icons-round" style="font-size: 16px;">north_east</span></a></li>
-                <li><a href="https://github.com" target="_blank">GitHub <span class="material-icons-round" style="font-size: 16px;">north_east</span></a></li>
+                <li><a href="https://id.linkedin.com/in/muhamad-danny-lukmana-a74a6b295" target="_blank">LinkedIn <span class="material-icons-round" style="font-size: 16px;">north_east</span></a></li>
+                <li><a href="https://github.com/dannylukmana" target="_blank">GitHub <span class="material-icons-round" style="font-size: 16px;">north_east</span></a></li>
                 <li><a href="mailto:dannylukmana.business@gmail.com">Email Me <span class="material-icons-round" style="font-size: 16px;">mail</span></a></li>
                 <li><a href="#">Resume <span class="material-icons-round" style="font-size: 16px;">download</span></a></li>
             </ul>
@@ -949,7 +968,7 @@ footer {
             if (input.includes('kontak') || input.includes('hubungi') || input.includes('email') || input.includes('wa')) return "Boleh banget! Kirim email ke dannylukmana.business@gmail.com atau cek LinkedIn saya di bagian Contact.";
             if (input.includes('lokasi') || input.includes('tinggal') || input.includes('domisili')) return "Saya saat ini berdomisili di Jakarta, Indonesia.";
             if (input.includes('proyek') || input.includes('project') || input.includes('karya')) return "Beberapa proyek saya: Virtual Tour 360, Teavaro Funnel Manager, dan Alodokter Medical Platform.";
-            return "aduh males jawab, cari sendiri aja atau tanya di contact person bisa nanya langsung";
+            return "Maaf... Aku kurang bisa jelasin detail, mending langsung hubungi contact person aja biar dapat jawaban paling tepat";
         }
 
         // FAQ Accordion Logic
